@@ -122,7 +122,7 @@ TEMPLATES = [
     },
 ]
 
-# oscar needs these backends to allow customers to sign in using an email address rather than a username.
+### oscar needs these backends to allow customers to sign in using an email address rather than a username.
 AUTHENTICATION_BACKENDS = (
     'oscar.apps.customer.auth_backends.EmailBackend',
     'django.contrib.auth.backends.ModelBackend',
@@ -181,6 +181,19 @@ MEDIA_URL = '/media/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+### emailing credentials
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com' # or only your domain name if you have your own mail server
+EMAIL_PORT = 587 #587
+EMAIL_USE_TLS = True
+# TO USE THESE VARIABLES BELOW, USE ENVIRONMENT VARIABLES TO HIDE SENSITIVE INFO
+# CHECK CoreyMs' Django TUTORIAL # 12 -- 14:20
+EMAIL_HOST_USER = os.environ.get('ADMIN_EMAIL_UN') # var for email username
+EMAIL_HOST_PASSWORD = os.environ.get('ADMIN_EMAIL_PW') # var for email pw
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER # for email-sending pw-reset requests
+
+### oscar needs this
 HAYSTACK_CONNECTIONS = {
     'default': {
         'ENGINE': 'haystack.backends.simple_backend.SimpleEngine',
@@ -197,3 +210,13 @@ HAYSTACK_CONNECTIONS = {
 #         'INCLUDE_SPELLING': True,
 #     },
 # }
+
+### oscar needs this
+# see https://django-oscar.readthedocs.io/en/stable/internals/getting_started.html
+OSCAR_INITIAL_ORDER_STATUS = 'Pending'
+OSCAR_INITIAL_LINE_STATUS = 'Pending'
+OSCAR_ORDER_STATUS_PIPELINE = {
+    'Pending': ('Being processed', 'Cancelled',),
+    'Being processed': ('Processed', 'Cancelled',),
+    'Cancelled': (),
+}
